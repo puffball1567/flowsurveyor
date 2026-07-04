@@ -1,0 +1,8 @@
+include ./test_aggregate
+include ./test_analysis
+include ./test_jsonio
+include ./test_integration
+include ./test_validation
+include ./test_quality
+include ./test_variants
+include ./test_recommendations
