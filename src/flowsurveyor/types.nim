@@ -78,6 +78,35 @@ type
     score*: float
     reason*: string
 
+  WaitInsight* = object
+    edgeId*: string
+    fromNode*: string
+    toNode*: string
+    count*: Natural
+    blockedCount*: Natural
+    totalWaitMillis*: Natural
+    averageWaitMillis*: float
+    reason*: string
+
+  ParallelismOpportunity* = object
+    nodeId*: string
+    fanIn*: Natural
+    fanOut*: Natural
+    observedDurationMillis*: Natural
+    onCriticalPath*: bool
+    score*: float
+    reason*: string
+
+  FailureImpact* = object
+    targetId*: string
+    kind*: string
+    failureCount*: Natural
+    retryCount*: Natural
+    failedDurationMillis*: Natural
+    retryDurationMillis*: Natural
+    score*: float
+    reason*: string
+
   RecommendationKind* = enum
     rkIncreaseParallelism,
     rkInvestigateFailures,
@@ -117,6 +146,9 @@ type
     target*: VariantSummary
     durationDeltaMillis*: int
     failureDelta*: int
+    summary*: string
+    improvements*: seq[string]
+    regressions*: seq[string]
 
   SurveyReport* = object
     schemaVersion*: Natural
@@ -126,6 +158,9 @@ type
     edgeStats*: seq[AggregateStats]
     criticalPath*: CriticalPath
     bottlenecks*: seq[Bottleneck]
+    waitInsights*: seq[WaitInsight]
+    parallelismOpportunities*: seq[ParallelismOpportunity]
+    failureImpacts*: seq[FailureImpact]
     recommendations*: seq[Recommendation]
     qualityIssues*: seq[EventQualityIssue]
 
