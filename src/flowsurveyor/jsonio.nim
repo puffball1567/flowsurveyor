@@ -34,6 +34,41 @@ proc toJson*(value: Bottleneck): JsonNode =
     "reason": value.reason
   }
 
+proc toJson*(value: WaitInsight): JsonNode =
+  %*{
+    "edgeId": value.edgeId,
+    "fromNode": value.fromNode,
+    "toNode": value.toNode,
+    "count": int(value.count),
+    "blockedCount": int(value.blockedCount),
+    "totalWaitMillis": int(value.totalWaitMillis),
+    "averageWaitMillis": value.averageWaitMillis,
+    "reason": value.reason
+  }
+
+proc toJson*(value: ParallelismOpportunity): JsonNode =
+  %*{
+    "nodeId": value.nodeId,
+    "fanIn": int(value.fanIn),
+    "fanOut": int(value.fanOut),
+    "observedDurationMillis": int(value.observedDurationMillis),
+    "onCriticalPath": value.onCriticalPath,
+    "score": value.score,
+    "reason": value.reason
+  }
+
+proc toJson*(value: FailureImpact): JsonNode =
+  %*{
+    "targetId": value.targetId,
+    "kind": value.kind,
+    "failureCount": int(value.failureCount),
+    "retryCount": int(value.retryCount),
+    "failedDurationMillis": int(value.failedDurationMillis),
+    "retryDurationMillis": int(value.retryDurationMillis),
+    "score": value.score,
+    "reason": value.reason
+  }
+
 proc toJson*(value: Recommendation): JsonNode =
   %*{
     "id": value.id,
@@ -67,6 +102,13 @@ proc toJson*(value: VariantComparison): JsonNode =
   result["target"] = toJson(value.target)
   result["durationDeltaMillis"] = %value.durationDeltaMillis
   result["failureDelta"] = %value.failureDelta
+  result["summary"] = %value.summary
+  result["improvements"] = newJArray()
+  for item in value.improvements:
+    result["improvements"].add(%item)
+  result["regressions"] = newJArray()
+  for item in value.regressions:
+    result["regressions"].add(%item)
 
 proc toJson*(value: SurveyReport): JsonNode =
   result = newJObject()
@@ -83,6 +125,15 @@ proc toJson*(value: SurveyReport): JsonNode =
   result["bottlenecks"] = newJArray()
   for item in value.bottlenecks:
     result["bottlenecks"].add(toJson(item))
+  result["waitInsights"] = newJArray()
+  for item in value.waitInsights:
+    result["waitInsights"].add(toJson(item))
+  result["parallelismOpportunities"] = newJArray()
+  for item in value.parallelismOpportunities:
+    result["parallelismOpportunities"].add(toJson(item))
+  result["failureImpacts"] = newJArray()
+  for item in value.failureImpacts:
+    result["failureImpacts"].add(toJson(item))
   result["recommendations"] = newJArray()
   for item in value.recommendations:
     result["recommendations"].add(toJson(item))

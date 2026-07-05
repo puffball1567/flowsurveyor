@@ -30,7 +30,7 @@ This boundary is intentionally small:
 
 Adapters from FlowDependency, FlowLogbook, runner logs, databases, or external
 systems should map their native records into `SurveyGraph` and `SurveyEvent`.
-FlowSurveyor should not depend directly on those packages in v0.1.0.
+FlowSurveyor should not depend directly on those packages in v0.2.0.
 
 ## Error Handling
 

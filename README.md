@@ -7,7 +7,7 @@ It is part of the **FlowBrigade Toolkit**.
 
 ## Status
 
-FlowSurveyor v0.1.0 is focused on offline flow analysis. Within that scope,
+FlowSurveyor v0.2.0 is focused on offline flow analysis. Within that scope,
 the current version provides:
 
 - graph and event analysis primitives
@@ -15,23 +15,30 @@ the current version provides:
 - success/failure aggregation
 - critical path analysis from observed edge durations
 - bottleneck ranking
+- wait and blocked-edge insights
+- parallelism opportunity ranking
+- failure and retry impact analysis
 - improvement recommendations
 - event quality checks
-- variant duration/failure comparison
+- variant duration/failure comparison with improvement/regression notes
 - JSON report export
 - examples, tests, design notes, and benchmarks
 
-## v0.1.0 Scope
+## v0.2.0 Scope
 
-The v0.1.0 scope is intentionally narrow and complete:
+The v0.2.0 scope is intentionally narrow and complete:
 
 - accept an in-memory `SurveyGraph` and observed `SurveyEvent` values
 - aggregate node and edge duration, success, and failure statistics
 - compute the observed critical path for directed acyclic graphs
 - rank bottlenecks by duration and failure impact
+- report edge wait time and blocked handoffs
+- rank nodes that may benefit from splitting or parallelism
+- report failure and retry impact from observed events
 - emit rule-based improvement recommendations
 - detect basic event quality issues before trusting a report
 - compare variants by observed duration, failures, and event count
+- describe variant improvements and regressions
 - export a JSON report with `schemaVersion = 1`
 
 Recommendations are explainable rule-based hints. They are not an automatic
@@ -71,6 +78,15 @@ let events = @[
 let report = survey(graph, events)
 echo report.toJsonString()
 ```
+
+The report includes structured fields for:
+
+- `criticalPath`
+- `bottlenecks`
+- `waitInsights`
+- `parallelismOpportunities`
+- `failureImpacts`
+- `recommendations`
 
 Variant comparison can be computed from events that carry `variantId`:
 
