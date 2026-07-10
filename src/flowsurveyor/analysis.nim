@@ -282,6 +282,78 @@ proc failureImpacts*(events: openArray[SurveyEvent]; limit = 5): seq[FailureImpa
   if result.len > limit:
     result.setLen(limit)
 
+
+proc metricNumber(event: SurveyEvent; names: openArray[string]): float =
+  for metric in event.metrics:
+    let key = metric.key.strip().toLowerAscii()
+    for name in names:
+      if key == name:
+        try:
+          let value = parseFloat(metric.value.strip())
+          if value >= 0.0:
+            return value
+        except ValueError:
+          discard
+  0.0
+
+proc metricNatural(event: SurveyEvent; names: openArray[string]): Natural =
+  let value = metricNumber(event, names)
+  if value <= 0.0:
+    return 0
+  Natural(value.int)
+
+proc percent(numerator, denominator: float): float =
+  if denominator <= 0.0:
+    return 0.0
+  numerator / denominator * 100.0
+
+proc operationalSummary*(events: openArray[SurveyEvent]): OperationalSummary =
+  for event in events:
+    requireValid(event)
+    if event.nodeId.len > 0 and event.kind == sekNodeFinished:
+      result.executionCount.inc
+      result.totalCycleTimeMillis += event.durationMillis
+      case event.status
+      of fsSucceeded:
+        result.succeededCount.inc
+      of fsFailed:
+        result.failedCount.inc
+      of fsSkipped:
+        result.skippedCount.inc
+      else:
+        discard
+
+    if event.edgeId.len > 0:
+      case event.kind
+      of sekEdgeWaiting:
+        result.totalWaitTimeMillis += event.durationMillis
+      of sekEdgeBlocked:
+        result.totalBlockedTimeMillis += event.durationMillis
+      else:
+        discard
+
+    result.workUnits += metricNumber(event, ["work", "work_units", "units", "records", "items"])
+    result.acceptedUnits += metricNumber(event, ["accepted", "accepted_units", "good", "good_units", "passed"])
+    result.defectUnits += metricNumber(event, ["defects", "defect_units", "rejected", "rejected_units", "failed_units"])
+    result.retryCount += metricNatural(event, ["retry", "retries", "retry_count", "attempt_retries", "retrycount"])
+
+  result.totalObservedTimeMillis = result.totalCycleTimeMillis +
+    result.totalWaitTimeMillis + result.totalBlockedTimeMillis
+  if result.executionCount > 0:
+    result.averageCycleTimeMillis = result.totalCycleTimeMillis.float /
+      result.executionCount.float
+    result.failureRate = percent(result.failedCount.float, result.executionCount.float)
+    result.retryRate = percent(result.retryCount.float, result.executionCount.float)
+
+  let completedAndDefect = result.acceptedUnits + result.defectUnits
+  if completedAndDefect > 0.0:
+    result.defectRate = percent(result.defectUnits, completedAndDefect)
+    result.firstPassYield = percent(result.acceptedUnits, completedAndDefect)
+
+  if result.totalObservedTimeMillis > 0:
+    result.throughputPerHour = result.succeededCount.float /
+      (result.totalObservedTimeMillis.float / 3600000.0)
+
 proc survey*(graph: SurveyGraph; events: openArray[SurveyEvent];
     bottleneckLimit = 5): SurveyReport =
   requireValid(graph)
@@ -296,6 +368,7 @@ proc survey*(graph: SurveyGraph; events: openArray[SurveyEvent];
     waitInsights: waitInsights(graph, events, bottleneckLimit),
     parallelismOpportunities: parallelismOpportunities(graph, events, bottleneckLimit),
     failureImpacts: failureImpacts(events, bottleneckLimit),
+    operationalSummary: operationalSummary(events),
     qualityIssues: eventQualityIssues(graph, events)
   )
   result.recommendations = recommendations(result)

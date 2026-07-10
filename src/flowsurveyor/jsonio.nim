@@ -69,6 +69,29 @@ proc toJson*(value: FailureImpact): JsonNode =
     "reason": value.reason
   }
 
+
+proc toJson*(value: OperationalSummary): JsonNode =
+  %*{
+    "executionCount": int(value.executionCount),
+    "succeededCount": int(value.succeededCount),
+    "failedCount": int(value.failedCount),
+    "skippedCount": int(value.skippedCount),
+    "retryCount": int(value.retryCount),
+    "workUnits": value.workUnits,
+    "acceptedUnits": value.acceptedUnits,
+    "defectUnits": value.defectUnits,
+    "totalCycleTimeMillis": int(value.totalCycleTimeMillis),
+    "averageCycleTimeMillis": value.averageCycleTimeMillis,
+    "totalWaitTimeMillis": int(value.totalWaitTimeMillis),
+    "totalBlockedTimeMillis": int(value.totalBlockedTimeMillis),
+    "totalObservedTimeMillis": int(value.totalObservedTimeMillis),
+    "throughputPerHour": value.throughputPerHour,
+    "failureRate": value.failureRate,
+    "defectRate": value.defectRate,
+    "retryRate": value.retryRate,
+    "firstPassYield": value.firstPassYield
+  }
+
 proc toJson*(value: Recommendation): JsonNode =
   %*{
     "id": value.id,
@@ -134,6 +157,7 @@ proc toJson*(value: SurveyReport): JsonNode =
   result["failureImpacts"] = newJArray()
   for item in value.failureImpacts:
     result["failureImpacts"].add(toJson(item))
+  result["operationalSummary"] = toJson(value.operationalSummary)
   result["recommendations"] = newJArray()
   for item in value.recommendations:
     result["recommendations"].add(toJson(item))
