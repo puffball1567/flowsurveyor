@@ -18,6 +18,10 @@ suite "json io":
       failureImpacts: @[FailureImpact(targetId: "a", kind: "node",
         failureCount: 1, retryCount: 2, failedDurationMillis: 30,
         retryDurationMillis: 30, score: 210, reason: "failure")],
+      operationalSummary: OperationalSummary(executionCount: 2,
+        succeededCount: 1, failedCount: 1, retryCount: 2,
+        totalCycleTimeMillis: 40, totalObservedTimeMillis: 40,
+        throughputPerHour: 90.0, failureRate: 50.0),
       recommendations: @[Recommendation(
         id: "r1",
         kind: rkIncreaseParallelism,
@@ -42,5 +46,7 @@ suite "json io":
     check node["waitInsights"][0]["edgeId"].getStr() == "a-b"
     check node["parallelismOpportunities"][0]["nodeId"].getStr() == "a"
     check node["failureImpacts"][0]["retryCount"].getInt() == 2
+    check node["operationalSummary"]["executionCount"].getInt() == 2
+    check node["operationalSummary"]["failureRate"].getFloat() == 50.0
     check node["recommendations"][0]["kind"].getStr() == "rkIncreaseParallelism"
     check node["qualityIssues"][0]["kind"].getStr() == "eqikMissingDuration"

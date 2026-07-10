@@ -1,3 +1,4 @@
+import std/math
 import std/unittest
 
 import flowsurveyor
@@ -110,3 +111,44 @@ suite "analysis":
     let report = survey(graph, events)
     check report.failureImpacts.len == 1
     check report.recommendations.len > 0
+
+
+  test "summarizes operational indicators for reports":
+    let graph = sampleGraph()
+    let events = @[
+      surveyEvent("n1", "test", "flow", "run", sekNodeFinished,
+        nodeId = "extract", status = fsSucceeded, durationMillis = 1000,
+        metrics = [kv("records", "100"), kv("accepted", "90"), kv("defects", "10")]),
+      surveyEvent("n2", "test", "flow", "run", sekNodeFinished,
+        nodeId = "transform", status = fsFailed, durationMillis = 2000,
+        metrics = [kv("retry_count", "2")]),
+      surveyEvent("n3", "test", "flow", "run", sekNodeFinished,
+        nodeId = "publish", status = fsSkipped),
+      surveyEvent("e1", "test", "flow", "run", sekEdgeWaiting,
+        edgeId = "extract-transform", status = fsSucceeded, durationMillis = 500),
+      surveyEvent("e2", "test", "flow", "run", sekEdgeBlocked,
+        edgeId = "transform-publish", status = fsFailed, durationMillis = 500)
+    ]
+
+    let summary = operationalSummary(events)
+    check summary.executionCount == 3
+    check summary.succeededCount == 1
+    check summary.failedCount == 1
+    check summary.skippedCount == 1
+    check summary.retryCount == 2
+    check summary.workUnits == 100.0
+    check summary.acceptedUnits == 90.0
+    check summary.defectUnits == 10.0
+    check summary.totalCycleTimeMillis == 3000
+    check summary.totalWaitTimeMillis == 500
+    check summary.totalBlockedTimeMillis == 500
+    check summary.totalObservedTimeMillis == 4000
+    check abs(summary.failureRate - (100.0 / 3.0)) < 0.000001
+    check summary.defectRate == 10.0
+    check abs(summary.retryRate - (200.0 / 3.0)) < 0.000001
+    check summary.firstPassYield == 90.0
+    check summary.throughputPerHour == 900.0
+
+    let report = survey(graph, events)
+    check report.operationalSummary.executionCount == 3
+    check report.operationalSummary.defectRate == 10.0

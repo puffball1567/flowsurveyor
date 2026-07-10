@@ -133,6 +133,28 @@ type
     targetId*: string
     message*: string
 
+
+
+  OperationalSummary* = object
+    executionCount*: Natural
+    succeededCount*: Natural
+    failedCount*: Natural
+    skippedCount*: Natural
+    retryCount*: Natural
+    workUnits*: float
+    acceptedUnits*: float
+    defectUnits*: float
+    totalCycleTimeMillis*: Natural
+    averageCycleTimeMillis*: float
+    totalWaitTimeMillis*: Natural
+    totalBlockedTimeMillis*: Natural
+    totalObservedTimeMillis*: Natural
+    throughputPerHour*: float
+    failureRate*: float
+    defectRate*: float
+    retryRate*: float
+    firstPassYield*: float
+
   VariantSummary* = object
     variantId*: string
     totalDurationMillis*: Natural
@@ -161,6 +183,7 @@ type
     waitInsights*: seq[WaitInsight]
     parallelismOpportunities*: seq[ParallelismOpportunity]
     failureImpacts*: seq[FailureImpact]
+    operationalSummary*: OperationalSummary
     recommendations*: seq[Recommendation]
     qualityIssues*: seq[EventQualityIssue]
 

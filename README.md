@@ -7,7 +7,7 @@ It is part of the **FlowBrigade Toolkit**.
 
 ## Status
 
-FlowSurveyor v0.2.0 is focused on offline flow analysis. Within that scope,
+FlowSurveyor v0.3.0 is focused on offline flow analysis. Within that scope,
 the current version provides:
 
 - graph and event analysis primitives
@@ -18,15 +18,17 @@ the current version provides:
 - wait and blocked-edge insights
 - parallelism opportunity ranking
 - failure and retry impact analysis
+- operational summary metrics for cycle time, wait/blocking time, throughput,
+  failure rate, defect rate, retry rate, and first-pass yield
 - improvement recommendations
 - event quality checks
 - variant duration/failure comparison with improvement/regression notes
 - JSON report export
 - examples, tests, design notes, and benchmarks
 
-## v0.2.0 Scope
+## v0.3.0 Scope
 
-The v0.2.0 scope is intentionally narrow and complete:
+The v0.3.0 scope is intentionally narrow and complete:
 
 - accept an in-memory `SurveyGraph` and observed `SurveyEvent` values
 - aggregate node and edge duration, success, and failure statistics
@@ -35,6 +37,8 @@ The v0.2.0 scope is intentionally narrow and complete:
 - report edge wait time and blocked handoffs
 - rank nodes that may benefit from splitting or parallelism
 - report failure and retry impact from observed events
+- summarize operational indicators such as throughput, cycle time, defect rate,
+  retry rate, and first-pass yield
 - emit rule-based improvement recommendations
 - detect basic event quality issues before trusting a report
 - compare variants by observed duration, failures, and event count
@@ -86,6 +90,7 @@ The report includes structured fields for:
 - `waitInsights`
 - `parallelismOpportunities`
 - `failureImpacts`
+- `operationalSummary`
 - `recommendations`
 
 Variant comparison can be computed from events that carry `variantId`:
