@@ -6,3 +6,4 @@ include ./test_validation
 include ./test_quality
 include ./test_variants
 include ./test_recommendations
+include ./test_memory_model
