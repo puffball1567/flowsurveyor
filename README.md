@@ -7,7 +7,7 @@ It is part of the **FlowBrigade Toolkit**.
 
 ## Status
 
-FlowSurveyor v0.3.0 is focused on offline flow analysis. Within that scope,
+FlowSurveyor v0.3.1 is focused on offline flow analysis. Within that scope,
 the current version provides:
 
 - graph and event analysis primitives
@@ -140,7 +140,11 @@ The public API is exported from `import flowsurveyor`:
 nimble test
 nimble examples
 nimble bench
+nimble leak
 ```
+
+`nimble leak` builds the ARC release leak probe and runs it under Valgrind,
+failing on definite or indirect leaks.
 
 ## Intellectual Property Notes
 
